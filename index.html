@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fff0f6">
+<title>我的小猫小屋</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#fff7fb;color:#62465b;
+font-family:system-ui,sans-serif}
+main{max-width:440px;margin:auto;padding:20px}
+h1{text-align:center;font-size:25px}
+p{text-align:center}
+.room{background:#fce7f3;border-radius:28px;
+padding:25px 15px;text-align:center;transition:.3s}
+.cat{font-size:100px;cursor:pointer;
+user-select:none;transition:transform .2s}
+.cat:active{transform:scale(1.15)}
+.bubble{background:white;border-radius:18px;
+padding:12px;margin:10px auto;max-width:90%}
+.stats{display:flex;justify-content:space-around;
+margin:18px 0;gap:8px}
+.stat,.panel{background:white;border-radius:16px;
+padding:12px;text-align:center}
+button{border:0;border-radius:16px;padding:13px 10px;
+background:#f9c9df;color:#62465b;font-size:15px;
+cursor:pointer}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);
+gap:8px}
+.panel{margin-top:18px;text-align:left}
+.decor{display:flex;gap:8px;justify-content:center}
+.decor button{flex:1}
+#chat{height:130px;overflow:auto;background:#fff7fb;
+padding:10px;border-radius:12px;margin:10px 0}
+form{display:flex;gap:6px}
+input{min-width:0;flex:1;border:1px solid #eac8db;
+border-radius:12px;padding:10px;font-size:15px}
+.small{font-size:12px;color:#967b90}
+</style>
+</head>
+<body>
+<main>
+<h1>我的小猫小屋</h1>
+<p>今天也要和小猫一起玩呀</p>
+
+<section class="room" id="room">
+<div class="bubble" id="say">喵～你来啦！</div>
+<div class="cat" id="cat" role="button"
+tabindex="0" aria-label="摸摸小猫">🐱</div>
+<div id="mood">小猫今天心情不错</div>
+</section>
+
+<div class="stats">
+<div class="stat">开心<br>💗 <span id="happy">60</span></div>
+<div class="stat">饱腹<br>🍰 <span id="food">60</span></div>
+</div>
+
+<div class="actions">
+<button id="pet">摸摸它</button>
+<button id="feed">喂小点心</button>
+<button id="talk">跟它聊天</button>
+</div>
+
+<section class="panel">
+<strong>装饰小屋</strong>
+<p>选择喜欢的房间颜色</p>
+<div class="decor">
+<button data-color="#fce7f3">樱花粉</button>
+<button data-color="#ede9fe">梦幻紫</button>
+<button data-color="#dcfce7">薄荷绿</button>
+</div>
+</section>
+
+<section class="panel" id="chatPanel">
+<strong>和小猫说说话</strong>
+<div id="chat" aria-live="polite">
+小猫：今天想玩什么呀？
+</div>
+<form id="form">
+<input id="message" placeholder="输入一句话..." maxlength="200">
+<button>发送</button>
+</form>
+<p class="small">当前为演示聊天，尚未连接 AI。</p>
+</section>
+</main>
+
+<script>
+let happy=60, food=60;
+const $=id=>document.getElementById(id);
+function update(){
+  $('happy').textContent=happy;
+  $('food').textContent=food;
+  $('mood').textContent=happy>75?'小猫开心得蹦蹦跳！':
+    happy<35?'小猫想要你陪陪它':'小猫今天心情不错';
+}
+$('pet').onclick=()=>{
+  happy=Math.min(100,happy+10);
+  $('say').textContent='呼噜呼噜～好喜欢你！';
+  update();
+};
+$('cat').onclick=$('cat').onkeydown=e=>{
+  if(e.type==='click'||e.key==='Enter'){
+    happy=Math.min(100,happy+5);
+    $('say').textContent='喵呜～再摸摸我嘛！';
+    update();
+  }
+};
+$('feed').onclick=()=>{
+  food=Math.min(100,food+15);
+  $('say').textContent='好吃！谢谢你给我点心～';
+  update();
+};
+$('talk').onclick=()=>{
+  $('chatPanel').scrollIntoView({behavior:'smooth'});
+  $('message').focus();
+};
+document.querySelectorAll('[data-color]').forEach(btn=>{
+  btn.onclick=()=> $('room').style.background=btn.dataset.color;
+});
+$('form').onsubmit=e=>{
+  e.preventDefault();
+  const input=$('message');
+  const msg=input.value.trim();
+  if(!msg)return;
+  const line=document.createElement('div');
+  line.textContent='你：'+msg;
+  $('chat').appendChild(line);
+  const reply=document.createElement('div');
+  reply.textContent='小猫：喵～我听见啦！等我们接入 AI，我就能认真回答你啦。';
+  $('chat').appendChild(reply);
+  $('chat').scrollTop=$('chat').scrollHeight;
+  input.value='';
+};
+update();
+</script>
+</body>
+</html>
